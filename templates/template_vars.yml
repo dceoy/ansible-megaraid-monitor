@@ -1,0 +1,5 @@
+http_proxy: http://proxy.example.com:8080
+slack_token: XXXXXXXXX/YYYYYYYYY/ZZZZZZZZZZZZZZZZZZZZZZZZZZ
+slack_channel: megaraid
+slack_icon_url: https://pbs.twimg.com/profile_images/428287509047435264/ElOjna20.png
+monitor_log_path: /tmp/megacli_pdlist.log

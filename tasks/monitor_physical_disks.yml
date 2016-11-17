@@ -1,0 +1,60 @@
+---
+- name: Fetch a number of drives
+  become: true
+  shell: |
+    /opt/MegaRAID/MegaCli/MegaCli64 -Encinfo -aALL -nolog \
+      | grep 'Number of Physical Drives' \
+      | awk -F ' : ' '{ sum += $2 } END { print sum }'
+  register: n_drives
+
+- name: Fetch a state of a previous log file
+  stat: path={{ monitor_log_path }}
+  register: previous_log_file
+
+- name: Count online drives at a previous run
+  when:
+    - previous_log_file.stat.exists
+  shell: |
+    grep -c 'Online, Spun Up' "{{ monitor_log_path }}"
+  register: previous_n_online
+
+- name: Count currently online drives
+  become: true
+  shell: |
+    /opt/MegaRAID/MegaCli/MegaCli64 -PDList -aALL -nolog > "{{ monitor_log_path }}"
+    grep -c 'Firmware state: Online, Spun Up' "{{ monitor_log_path }}"
+  register: n_online
+
+- name: Summarize firmware states
+  shell: |
+    echo '[ firmware states on {{ inventory_hostname }} ]'
+    grep -e '^Firmware state' "{{ monitor_log_path }}" \
+      | sed -e 's/Firmware state: / \/  {{ n_drives.stdout }}  drives  :\t/' \
+      | sort \
+      | uniq -c
+  register: fw_states_msg
+
+- name: Send a good message via Slack
+  when:
+    - not previous_log_file.stat.exists
+    - n_online.stdout == n_drives.stdout
+  local_action:
+    module: slack
+    token: "{{ slack_token }}"
+    msg: "{{ fw_states_msg.stdout }}"
+    color: good
+    channel: "#{{ slack_channel }}"
+    username: "Ansible on {{ inventory_hostname }}"
+    icon_url: "{{ slack_icon_url }}"
+
+- name: Send a warning message via Slack
+  when:
+    - n_online.stdout not in [ n_drives.stdout, previous_n_online.stdout ]
+  local_action:
+    module: slack
+    token: "{{ slack_token }}"
+    msg: "@channel WARNING\n{{ fw_states_msg.stdout }}"
+    color: warning
+    channel: "#{{ slack_channel }}"
+    username: "Ansible on {{ inventory_hostname }}"
+    icon_url: "{{ slack_icon_url }}"

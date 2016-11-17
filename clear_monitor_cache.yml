@@ -1,0 +1,8 @@
+---
+- hosts: megaraid
+  vars_files:
+    - vars.yml
+  environment:
+    https_proxy: "{{ http_proxy }}"
+  tasks:
+    - include: tasks/monitor_physical_disks.yml
