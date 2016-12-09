@@ -2,8 +2,8 @@
 - name: Fetch a number of drives
   become: true
   shell: |
-    /opt/MegaRAID/MegaCli/MegaCli64 -Encinfo -aALL -nolog \
-      | grep 'Number of Physical Drives' \
+    /opt/MegaRAID/MegaCli/MegaCli64 -LDInfo -Lall -aALL -nolog \
+      | grep 'Number Of Drives' \
       | awk -F ' : ' '{ sum += $2 } END { print sum }'
   register: n_drives
 
@@ -17,6 +17,13 @@
   shell: |
     grep -c 'Online, Spun Up' "{{ monitor_log_path }}"
   register: previous_n_online
+
+- name: Set previous_n_online.stdout
+  when:
+    - not previous_log_file.stat.exists
+  set_fact:
+    previous_n_online:
+      stdout: ''
 
 - name: Count currently online drives
   become: true
@@ -44,7 +51,7 @@
     msg: "{{ fw_states_msg.stdout }}"
     color: good
     channel: "#{{ slack_channel }}"
-    username: "Ansible on {{ inventory_hostname }}"
+    username: "{{ ansible_ssh_user }}@{{ inventory_hostname }}"
     icon_url: "{{ slack_icon_url }}"
 
 - name: Send a warning message via Slack
@@ -56,5 +63,5 @@
     msg: "@channel WARNING\n{{ fw_states_msg.stdout }}"
     color: warning
     channel: "#{{ slack_channel }}"
-    username: "Ansible on {{ inventory_hostname }}"
+    username: "{{ ansible_ssh_user }}@{{ inventory_hostname }}"
     icon_url: "{{ slack_icon_url }}"
