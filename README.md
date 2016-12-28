@@ -9,10 +9,10 @@ Preparation
 ```sh
 $ git clone https://github.com/dceoy/ansible-megaraid-monitor.git
 $ cd ansible-megaraid-monitor
-$ cp templates/template_vars.yml vars.yml
+$ cp examples/example_vars.yml vars.yml
 $ vim vars.yml  # => edit
-$ cp templates/template_hosts.yml hosts.yml
-$ vim hosts.yml  # => edit
+$ cp examples/example_hosts hosts
+$ vim hosts     # => edit
 ```
 
 Usage
