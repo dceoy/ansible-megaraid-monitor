@@ -4,3 +4,14 @@
   file: >
     path={{ monitor_log_path }}
     state=absent
+  register: clear_log
+
+- name: Send a message via Slack
+  when: clear_log|success
+  local_action:
+    module: slack
+    token: "{{ slack_token }}"
+    msg: "Disk monitor cache was cleared."
+    channel: "#{{ slack_channel }}"
+    username: "{{ ansible_ssh_user }}@{{ inventory_hostname }}"
+    icon_url: "{{ slack_icon_url }}"

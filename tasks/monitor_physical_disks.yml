@@ -34,12 +34,15 @@
 
 - name: Summarize firmware states
   shell: |
-    echo '[ firmware states on {{ inventory_hostname }} ]'
     grep -e '^Firmware state' "{{ monitor_log_path }}" \
       | sed -e 's/Firmware state: / \/  {{ n_drives.stdout }}  drives  :\t/' \
       | sort \
       | uniq -c
   register: fw_states_msg
+
+- name: Set a message header
+  set_fact:
+    msg_header: '[ firmware states on {{ inventory_hostname }} ]'
 
 - name: Send a good message via Slack
   when:
@@ -48,7 +51,7 @@
   local_action:
     module: slack
     token: "{{ slack_token }}"
-    msg: "{{ fw_states_msg.stdout }}"
+    msg: "{{ msg_header }}\n{{ fw_states_msg.stdout }}"
     color: good
     channel: "#{{ slack_channel }}"
     username: "{{ ansible_ssh_user }}@{{ inventory_hostname }}"
@@ -60,7 +63,7 @@
   local_action:
     module: slack
     token: "{{ slack_token }}"
-    msg: "@channel WARNING\n{{ fw_states_msg.stdout }}"
+    msg: "@channel WARNING - Disk failure was detected.\n{{ msg_header }}\n{{ fw_states_msg.stdout }}"
     color: warning
     channel: "#{{ slack_channel }}"
     username: "{{ ansible_ssh_user }}@{{ inventory_hostname }}"
