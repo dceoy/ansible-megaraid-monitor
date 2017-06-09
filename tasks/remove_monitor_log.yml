@@ -13,5 +13,5 @@
     token: "{{ slack_token }}"
     msg: "Disk monitor cache was cleared."
     channel: "#{{ slack_channel }}"
-    username: "{{ ansible_ssh_user }}@{{ inventory_hostname }}"
+    username: "{{ ansible_user }}@{{ inventory_hostname }}"
     icon_url: "{{ slack_icon_url }}"

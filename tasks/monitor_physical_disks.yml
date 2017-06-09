@@ -48,31 +48,30 @@
   register: fw_states_msg
   changed_when: false
 
-- name: Set a message header
-  set_fact:
-    msg_header: '[ firmware states on {{ inventory_hostname }} ]'
-
-- name: Send a good message via Slack
+- name: Set a normal message
   when:
     - not previous_log_file.stat.exists
     - n_online.stdout == n_drives.stdout
-  local_action:
-    module: slack
-    token: "{{ slack_token }}"
-    msg: "{{ msg_header }}\n{{ fw_states_msg.stdout }}"
-    color: good
-    channel: "#{{ slack_channel }}"
-    username: "{{ ansible_ssh_user }}@{{ inventory_hostname }}"
-    icon_url: "{{ slack_icon_url }}"
+  set_fact:
+    slack_color: good
+    slack_msg: "[ firmware states on {{ inventory_hostname }} ]\n{{ fw_states_msg.stdout }}"
 
-- name: Send a warning message via Slack
+- name: Set a warning message
   when:
     - n_online.stdout not in [ n_drives.stdout, previous_n_online.stdout ]
+  set_fact:
+    slack_color: danger
+    slack_msg: "Disk failure was detected.\n[ firmware states on {{ inventory_hostname }} ]\n{{ fw_states_msg.stdout }}"
+
+- name: Send a message via Slack
+  when:
+    - slack_color is defined
+    - slack_msg is defined
   local_action:
     module: slack
     token: "{{ slack_token }}"
-    msg: "@channel WARNING - Disk failure was detected.\n{{ msg_header }}\n{{ fw_states_msg.stdout }}"
-    color: warning
+    msg: "{{ slack_msg }}"
+    color: "{{ slack_color }}"
     channel: "#{{ slack_channel }}"
-    username: "{{ ansible_ssh_user }}@{{ inventory_hostname }}"
+    username: "{{ ansible_user }}@{{ inventory_hostname }}"
     icon_url: "{{ slack_icon_url }}"
