@@ -10,6 +10,7 @@
       | grep 'Number Of Drives' \
       | awk -F ' : ' '{ sum += $2 } END { print sum }'
   register: n_drives
+  changed_when: false
 
 - name: Fetch a state of a previous log file
   stat: path={{ monitor_log_path }}
@@ -21,6 +22,7 @@
   shell: |
     grep -c 'Online, Spun Up' "{{ monitor_log_path }}"
   register: previous_n_online
+  changed_when: false
 
 - name: Set previous_n_online.stdout
   when:
@@ -35,6 +37,7 @@
     /opt/MegaRAID/MegaCli/MegaCli64 -PDList -aALL -nolog > "{{ monitor_log_path }}"
     grep -c 'Firmware state: Online, Spun Up' "{{ monitor_log_path }}"
   register: n_online
+  changed_when: false
 
 - name: Summarize firmware states
   shell: |
@@ -43,6 +46,7 @@
       | sort \
       | uniq -c
   register: fw_states_msg
+  changed_when: false
 
 - name: Set a message header
   set_fact:
