@@ -5,4 +5,4 @@
   environment:
     https_proxy: "{{ http_proxy }}"
   tasks:
-    - include: tasks/monitor_physical_disks.yml
+    - import_tasks: tasks/monitor_physical_disks.yml
