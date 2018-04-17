@@ -7,7 +7,7 @@
   register: clear_log
 
 - name: Send a message via Slack
-  when: clear_log|success
+  when: clear_log is success
   local_action:
     module: slack
     token: "{{ slack_token }}"
