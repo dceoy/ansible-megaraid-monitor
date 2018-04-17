@@ -2,7 +2,7 @@
 - name: Clear a monitor log file
   become: true
   file:
-    path: '/tmp/megacli_pdlist.log'
+    path: "{{ monitor_log_path }}"
     state: absent
   register: clear_log
 

@@ -1,8 +1,4 @@
 ---
-- name: Set a monitor log
-  set_fact:
-    monitor_log_path: '/tmp/megacli_pdlist.log'
-
 - name: Fetch a number of drives
   become: true
   shell: |
