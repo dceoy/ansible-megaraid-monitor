@@ -2,7 +2,7 @@
 - name: Clear a monitor log file
   become: true
   file:
-    path: "{{ monitor_log_path }}"
+    path: "{{ megaraid_monitor_log_path }}"
     state: absent
   register: clear_log
 

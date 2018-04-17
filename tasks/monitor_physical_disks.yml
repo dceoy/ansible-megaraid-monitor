@@ -9,14 +9,15 @@
   changed_when: false
 
 - name: Fetch a state of a previous log file
-  stat: path={{ monitor_log_path }}
+  stat:
+    path: "{{ megaraid_monitor_log_path }}"
   register: previous_log_file
 
 - name: Count online drives at a previous run
   when:
     - previous_log_file.stat.exists
   shell: |
-    grep -c 'Onln\s' "{{ monitor_log_path }}"
+    grep -c 'Onln\s' "{{ megaraid_monitor_log_path }}"
   register: previous_n_online
   changed_when: false
 
@@ -30,14 +31,14 @@
 - name: Count currently online drives
   become: true
   shell: |
-    /opt/MegaRAID/storcli/storcli64  /call/eall/sall show all > "{{ monitor_log_path }}"
-    grep -c 'Onln\s' "{{ monitor_log_path }}"
+    /opt/MegaRAID/storcli/storcli64  /call/eall/sall show all > "{{ megaraid_monitor_log_path }}"
+    grep -c 'Onln\s' "{{ megaraid_monitor_log_path }}"
   register: n_online
   changed_when: false
 
 - name: Summarize firmware states
   shell: |
-    grep -e 'Onln\s' "{{ monitor_log_path }}" \
+    grep -e 'Onln\s' "{{ megaraid_monitor_log_path }}" \
       | sed -e 's/^.*Onln.*/ \/  {{ n_drives.stdout }}  drives  :\t/' \
       | sort \
       | uniq -c
