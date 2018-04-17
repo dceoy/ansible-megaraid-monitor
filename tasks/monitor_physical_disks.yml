@@ -39,7 +39,7 @@
 - name: Summarize firmware states
   shell: |
     grep -e 'Onln\s' "{{ megaraid_monitor_log_path }}" \
-      | sed -e 's/^.*Onln.*/ \/  {{ n_drives.stdout }}  drives  :\t/' \
+      | sed -e 's/^.*Onln.*/ \/  {{ n_drives.stdout }}  drives  :\tOnline/' \
       | sort \
       | uniq -c
   register: fw_states_msg
