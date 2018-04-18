@@ -16,9 +16,7 @@ Preparation
 ```sh
 $ git clone https://github.com/dceoy/ansible-megaraid-monitor.git
 $ cd ansible-megaraid-monitor
-$ cp examples/example_vars.yml vars.yml
-$ vim vars.yml  # => edit
-$ cp examples/example_hosts hosts
+$ cp example_hosts hosts
 $ vim hosts     # => edit
 ```
 

@@ -51,14 +51,14 @@
     - n_online.stdout == n_drives.stdout
   set_fact:
     slack_color: good
-    slack_msg: "[ drive states on {{ inventory_hostname }} ]\n{{ drive_states_msg.stdout }}"
+    slack_msg: "[ drives at {{ inventory_hostname }} ]\n{{ drive_states_msg.stdout }}"
 
 - name: Set a warning message
   when:
     - n_online.stdout not in [ n_drives.stdout, previous_n_online.stdout ]
   set_fact:
     slack_color: danger
-    slack_msg: "Disk failure was detected.\n[ Drive states on {{ inventory_hostname }} ]\n{{ drive_states_msg.stdout }}"
+    slack_msg: "Disk failure was detected.\n[ drives at {{ inventory_hostname }} ]\n{{ drive_states_msg.stdout }}"
 
 - name: Send a message via Slack
   when:
