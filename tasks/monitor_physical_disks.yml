@@ -3,8 +3,7 @@
   become: true
   shell: |
     /opt/MegaRAID/storcli/storcli64 /call/vall show all \
-      | grep 'Number of Drives Per Span' \
-      | awk -F ' = ' '{ sum += $2 } END { print sum }'
+      | awk -F ' = ' '/Number of Drives Per Span/ { sum += $2 } END { print sum }'
   register: n_drives
   changed_when: false
 
@@ -17,7 +16,7 @@
   when:
     - previous_log_file.stat.exists
   shell: |
-    grep -c 'Onln\s' "{{ megaraid_monitor_log_path }}"
+    grep -ce '^[0-9]\+:[0-9]\+ \+[0-9]\+ \+Onln \+' "{{ megaraid_monitor_log_path }}"
   register: previous_n_online
   changed_when: false
 
@@ -32,17 +31,16 @@
   become: true
   shell: |
     /opt/MegaRAID/storcli/storcli64  /call/eall/sall show all > "{{ megaraid_monitor_log_path }}"
-    grep -c 'Onln\s' "{{ megaraid_monitor_log_path }}"
+    grep -ce '^[0-9]\+:[0-9]\+ \+[0-9]\+ \+Onln \+' "{{ megaraid_monitor_log_path }}"
   register: n_online
   changed_when: false
 
-- name: Summarize firmware states
+- name: Summarize drive states
   shell: |
-    grep -e 'Onln\s' "{{ megaraid_monitor_log_path }}" \
-      | sed -e 's/^.*Onln.*/ \/  {{ n_drives.stdout }}  drives  :\tOnline/' \
+    sed -ne 's/^[0-9]\+:[0-9]\+ \+[0-9]\+ \+\(.*\) \+[0-9]\+ \+.*$/ \/  {{ n_drives.stdout }}  drives  :\t\1/p' "{{ megaraid_monitor_log_path }}" \
       | sort \
       | uniq -c
-  register: fw_states_msg
+  register: drive_states_msg
   changed_when: false
 
 - name: Set a normal message
@@ -51,14 +49,14 @@
     - n_online.stdout == n_drives.stdout
   set_fact:
     slack_color: good
-    slack_msg: "[ firmware states on {{ inventory_hostname }} ]\n{{ fw_states_msg.stdout }}"
+    slack_msg: "[ drive states on {{ inventory_hostname }} ]\n{{ drive_states_msg.stdout }}"
 
 - name: Set a warning message
   when:
     - n_online.stdout not in [ n_drives.stdout, previous_n_online.stdout ]
   set_fact:
     slack_color: danger
-    slack_msg: "Disk failure was detected.\n[ firmware states on {{ inventory_hostname }} ]\n{{ fw_states_msg.stdout }}"
+    slack_msg: "Disk failure was detected.\n[ Drive states on {{ inventory_hostname }} ]\n{{ drive_states_msg.stdout }}"
 
 - name: Send a message via Slack
   when:
