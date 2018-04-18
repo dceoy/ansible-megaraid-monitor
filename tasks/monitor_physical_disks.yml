@@ -40,6 +40,8 @@
     sed -ne 's/^[0-9]\+:[0-9]\+ \+[0-9]\+ \+\(.*\) \+[0-9]\+ \+.*$/ \/  {{ n_drives.stdout }}  drives  :\t\1/p' "{{ megaraid_monitor_log_path }}" \
       | sort \
       | uniq -c
+  args:
+    warn: false
   register: drive_states_msg
   changed_when: false
 
