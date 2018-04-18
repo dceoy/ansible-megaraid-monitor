@@ -1,7 +1,14 @@
 ansible-megaraid-monitor
 ========================
 
+Version: v0.2.1
+
 Physical disk monitor using Ansible and Slack for MegaRAID
+
+Requirements of remote servers
+------------------------------
+
+- StorCLI
 
 Preparation
 -----------
