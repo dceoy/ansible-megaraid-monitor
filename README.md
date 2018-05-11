@@ -1,7 +1,7 @@
 ansible-megaraid-monitor
 ========================
 
-Version: v0.2.1
+Version: v0.2.2
 
 Physical disk monitor using Ansible and Slack for MegaRAID
 

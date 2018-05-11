@@ -2,8 +2,7 @@
 - name: Fetch a number of drives
   become: true
   shell: |
-    "{{ storcli_path }}" /call/vall show all \
-      | awk -F ' = ' '/Number of Drives Per Span/ { sum += $2 } END { print sum }'
+    "{{ storcli_path }}" /call show all | sed -ne 's/^Physical Drives = //p'
   register: n_drives
   changed_when: false
 
@@ -30,7 +29,7 @@
 - name: Count currently online drives
   become: true
   shell: |
-    "{{ storcli_path }}"  /call/eall/sall show all > "{{ megaraid_monitor_log_path }}"
+    "{{ storcli_path }}" /call show all > "{{ megaraid_monitor_log_path }}"
     grep -ce '^[0-9]\+:[0-9]\+ \+[0-9]\+ \+Onln \+' "{{ megaraid_monitor_log_path }}"
   register: n_online
   changed_when: false
@@ -38,8 +37,7 @@
 - name: Summarize drive states
   shell: |
     sed -ne 's/^[0-9]\+:[0-9]\+ \+[0-9]\+ \+\(.*\) \+[0-9]\+ \+.*$/ \/  {{ n_drives.stdout }}  drives  :\t\1/p' "{{ megaraid_monitor_log_path }}" \
-      | sort \
-      | uniq -c
+      | sort | uniq -c
   args:
     warn: false
   register: drive_states_msg
