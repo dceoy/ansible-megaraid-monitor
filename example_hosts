@@ -1,0 +1,14 @@
+[megaraid]
+server1
+server2
+
+[megaraid:vars]
+ansible_ssh_user = bot
+ansible_ssh_private_key_file = ~/.ssh/bot_rsa
+ansible_become_pass = password
+https_proxy = https://proxy.example.com:8080
+slack_channel = megaraid
+slack_icon_url = https://pbs.twimg.com/profile_images/428287509047435264/ElOjna20.png
+slack_token = XXXXXXXXX/YYYYYYYYY/ZZZZZZZZZZZZZZZZZZZZZZZZZZ
+storcli_path = /opt/MegaRAID/storcli/storcli64
+megaraid_monitor_log_path = /tmp/megaraid_monitor.log
