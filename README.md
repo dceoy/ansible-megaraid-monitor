@@ -8,9 +8,7 @@ Physical disk monitor using Ansible and Slack for MegaRAID
 Requirements of remote servers
 ------------------------------
 
-This tool's operation was checked using StorCli SAS Customization Utility Ver 1.23.02.
-
-- StorCLI
+- StorCLI (> Ver 1.23)
 
 Preparation
 -----------
