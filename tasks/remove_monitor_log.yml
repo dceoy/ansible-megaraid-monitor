@@ -8,6 +8,8 @@
 
 - name: Send a message via Slack
   when: clear_log is success
+  environment:
+    https_proxy: "{{ http_proxy if http_proxy is defined else '' }}"
   local_action:
     module: slack
     token: "{{ slack_token }}"

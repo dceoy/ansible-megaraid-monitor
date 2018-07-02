@@ -62,6 +62,8 @@
   when:
     - slack_color is defined
     - slack_msg is defined
+  environment:
+    https_proxy: "{{ http_proxy if http_proxy is defined else '' }}"
   local_action:
     module: slack
     token: "{{ slack_token }}"

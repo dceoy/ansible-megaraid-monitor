@@ -1,6 +1,4 @@
 ---
 - hosts: megaraid
-  environment:
-    https_proxy: "{{ http_proxy }}"
   tasks:
     - import_tasks: tasks/remove_monitor_log.yml
